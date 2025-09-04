@@ -4,7 +4,6 @@ Legacy Source of Miku Hatsune #8197
 ## Info
 this contains a legacy source of old chatbot miku hatunse which totally sucks because of the api sometimes not even answering.
 most scripts here are either incomplete and have bugs and thats why i rewrote the entire scripture to a newer api provider
-btw totally forgot to add .env
 which is [openrouter](https://openrouter.ai).
 
 ## contents
@@ -26,12 +25,13 @@ reactions.py = where the reactions examples are
 
 heres an illustration of where different files contribute to main.py
 ```
-       ┌──────────────┐                            
-       │              │                            
-preference.txt◄──────┐│                            
- │                   ││                            
- └►storage.json ◄───┐││                            
-         ▲ │  │     ││▼                            
+                       ┌►.env                      
+       ┌──────────────┐│   │                       
+       │              ││ ┌─┘                       
+preference.txt◄──────┐││ │                         
+ │                   │││ │                         
+ └►storage.json ◄───┐│││ │                         
+         ▲ │  │     ││▼│ ▼                         
          │ │  └───► Main.py ◄─────────┬───────────┐
          │ ▼        ││▲ │             │           │
      memories.py◄───┘││ └─┬──►slash_commands.py   │
@@ -40,6 +40,7 @@ preference.txt◄──────┐│
                                    │   │           
                                    └─►reactions.py 
 ```
+
 ## Dependencies
 - google-generativeai
 - os
