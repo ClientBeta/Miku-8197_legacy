@@ -14,16 +14,16 @@ which is [openrouter](https://openrouter.ai).
 - Tokens
 
 ## Structure
-- Main.py = Source of all which we know by now
-- preference.txt = ai reads script and follows it
-- storage.json = self explanation
-- memories.py = how a dvd reads and write yk
-- filter.json = filters what the ai and user says
-- slash_commands.py = commands where you type / it shows commands
-- ReactionLib.py = /reactions main source
-- reactions.py = where the reactions examples are
+Main.py = Source of all which we know by now<br>
+preference.txt = ai reads script and follows it<br>
+storage.json = self explanation<br>
+memories.py = how a dvd reads and write yk<br>
+filter.json = filters what the ai and user says<br>
+slash_commands.py = commands where you type / it shows commands<br>
+ReactionLib.py = /reactions main source<br>
+reactions.py = where the reactions examples are<br>
 
-heres an illustration of where different files contribute to main.py
+heres an illustration of where different files contribute to main.py<br>
 ```
                        ┌►.env                      
        ┌──────────────┐│   │                       
@@ -44,9 +44,10 @@ preference.txt◄──────┐││ │
 ## Dependencies
 - google-generativeai
 - os
-- dotenv
+- dotenv<br>
+
 thats pretty much it since pip packages will automatically install it for you
-while others are built in depedencies so u won't be bothered
+while others are built in depedencies so u won't be bothered.
 
 ## API
 this api uses gemini which is only good for tech support not for roleplaying
