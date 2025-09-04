@@ -14,14 +14,14 @@ which is [openrouter](https://openrouter.ai).
 - Tokens
 
 ## Structure
-Main.py = Source of all which we know by now
-preference.txt = ai reads script and follows it
-storage.json = self explanation
-memories.py = how a dvd reads and write yk
-filter.json = filters what the ai and user says
-slash_commands.py = commands where you type / it shows commands
-ReactionLib.py = /reactions main source
-reactions.py = where the reactions examples are
+- Main.py = Source of all which we know by now
+- preference.txt = ai reads script and follows it
+- storage.json = self explanation
+- memories.py = how a dvd reads and write yk
+- filter.json = filters what the ai and user says
+- slash_commands.py = commands where you type / it shows commands
+- ReactionLib.py = /reactions main source
+- reactions.py = where the reactions examples are
 
 heres an illustration of where different files contribute to main.py
 ```
