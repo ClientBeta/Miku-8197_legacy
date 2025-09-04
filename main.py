@@ -88,12 +88,6 @@ async def ready():
     except Exception as e:
         print(f"Failed to load ReactionLib cog: {e}")
 
-    try:
-        await bot.load_extension("Randomizer")
-        print("Randomizer cog loaded.")
-    except Exception as e:
-        print(f"Failed to load Randomizer cog: {e}")
-
 @bot.event
 async def on_msg(message):
     #this is the important part they made
@@ -154,4 +148,5 @@ async def main():
     async with bot:
         await bot.start(DC_Token)
 if __name__ == "__main__":
+
     asyncio.run(main())
