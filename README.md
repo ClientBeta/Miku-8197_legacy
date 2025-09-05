@@ -42,12 +42,55 @@ preference.txt◄──────┐││ │
 ```
 
 ## Dependencies
-- google-generativeai
-- os
-- dotenv<br>
 
-thats pretty much it since pip packages will automatically install it for you
-while others are built in depedencies so u won't be bothered.
+- aiohappyeyeballs
+- aiohttp
+- aiosignal
+- annotated-types
+- attrs
+- blinker
+- cachetools
+- certifi
+- charset-normalizer
+- click
+- discord.py
+- Flask
+- frozenlist
+- google-ai-generativelanguage
+- google-api-core
+- google-api-python-client
+- google-auth
+- google-auth-httplib2
+- google-generativeai
+- googleapis-common-protos
+- grpcio
+- grpcio-status
+- httplib2
+- idna
+- itsdangerous
+- Jinja2
+- MarkupSafe
+- multidict
+- propcache
+- proto-plus
+- protobuf
+- pyasn1
+- pyasn1_modules
+- pydantic
+- pydantic_core
+- pyparsing
+- python-dotenv
+- requests
+- rsa
+- tqdm
+- typing_extensions
+- typing-inspection
+- uritemplate
+- urllib3
+- Werkzeug
+- yarl
+
+some are not required lol
 
 ## API
 this api uses gemini which is only good for tech support not for roleplaying
