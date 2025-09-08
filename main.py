@@ -10,8 +10,8 @@ from memories import load_mem, save_mem
 
 # load initial resources
 load_dotenv()
-DC_Token=os.env("DC_AUTH")
-GoogleApi=os.env("GoogelApi")
+DC_Token=os.getenv("DC_AUTH")
+GoogleApi=os.getenv("GoogelApi")
 
 # injects the preference file
 def loadbread(source="preference.txt"):
@@ -150,3 +150,4 @@ async def main():
 if __name__ == "__main__":
 
     asyncio.run(main())
+
