@@ -44,7 +44,7 @@ intents.message_content= True # reserved for future projects
 
 MikuReplicated=load_mem("storage.json")
 
-bot= commands.bot(intents=intents)
+bot= commands.bot(command_prefix="!c", intents=intents)
 
 # i realise the bot wasn't sleeping
 async def unloadpeoplewhohadnotchattedawhile():
@@ -150,4 +150,5 @@ async def main():
 if __name__ == "__main__":
 
     asyncio.run(main())
+
 
