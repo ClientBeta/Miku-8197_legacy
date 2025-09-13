@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 
-def load_mem(file_path="braincells.json"):
+def load_mem(file_path="storage.json"):
     try:
         with open(file_path, "r") as f:
             data = json.load(f)
@@ -13,7 +13,7 @@ def load_mem(file_path="braincells.json"):
     except Exception as e:
         print(f"[!] Failed to load memory: {e}")
         return {}
-def save_mem(data, file_path="braincells.json"):
+def save_mem(data, file_path="storage.json"):
     try:
         # Convert datetime to ISO string
         save_data = {}
