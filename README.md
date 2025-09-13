@@ -5,6 +5,8 @@ Legacy Source of Miku Hatsune #8197
 the ram goes beserk if i use js so now yk why i have not coded it in javascript
 only those with threadripper can tank it
 
+subside i added the one with fixed by ai since mine looks like a racoon just tried coding
+
 ## Info
 this contains a legacy source of old chatbot miku hatunse which totally sucks because of the api sometimes not even answering.
 most scripts here are either incomplete and have bugs and thats why i rewrote the entire scripture to a newer api provider
