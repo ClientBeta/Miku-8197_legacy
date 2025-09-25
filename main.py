@@ -1,154 +1,191 @@
+
+# initial setup and imports
 import os
-import google.generativeai as genai
+import json
 import asyncio
 from datetime import datetime, timezone, timedelta
-from dotenv import load_dotenv
 import discord
-from discord.ext import commands # this did have a purpose except i modified some things
-import json
-from memories import load_mem, save_mem
+from discord.ext import commands
+from dotenv import load_dotenv
+import google.generativeai as genai
 
-# load initial resources
+# mem-cho's memory manager
+import memory_manager
+
+#Const and Configuration
+# COOL WE GOT A SIMPLIFIED VERSION SHOUTOUT TO RAM
+# - Said By Assistant
 load_dotenv()
-DC_Token=os.getenv("DC_AUTH")
-GoogleApi=os.getenv("GoogelApi")
+DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
+GOOGLE_API_KEY = os.getenv("GoogleApi")
+PREFERENCE_FILE = "preference.txt"
+FILTER_FILE = "filter.json"
+MEMORY_FILE = "storage.json"
+SESSION_TIMEOUT_MINUTES = 4 # How long before a user's session is unloaded from memory
+INACTIVITY_CHECK_SECONDS = 60
 
-# injects the preference file
-def loadbread(source="preference.txt"):
+# Setup.config probably something like that
+
+def load_bot_personality(file_path=PREFERENCE_FILE):
+    """Loads the bot's core personality prompt from a file."""
     try:
-        with open(source, "r", encoding="utf8") as f:
+        with open(file_path, "r", encoding="utf8") as f:
             return f.read().strip()
     except FileNotFoundError:
-        print("Wrong setting the file format try creating the exact `{file_path}`")
-        return "Think what would miku hatsune think"
+        print(f"did you add '{file_path}' because i can't found it so im using a default personality.")
+        return "You are a helpful and friendly assistant."
 
-# starting the thing
-mikuprefernce=loadbread()
-
-# filtered :neuro image here:
-
-def filterthing(filtered="filter.json"):
+def load_word_filters(file_path=FILTER_FILE):
+    """Loads filtered words and their corresponding responses from a JSON file."""
     try:
-        with open(filtered, "r") as f:
+        with open(file_path, "r", encoding="utf8") as f:
             return json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
-        return{}
-filtered=filterthing()
+        print(f"idk what u put into the '{file_path}'. so no words filters will be used.")
+        return {}
 
-# Model Config
-genai.configure(api_key=GoogleApi)
-model=genai.GenerativeModel("gemini-2.5-flash")
+# AI AI AI AI AI AI AI - NVDIA COORPORATION
 
-intents=discord.Intents.default()
-intents.message_content= True # reserved for future projects
+# Configure the Generative AI model
+genai.configure(api_key=GOOGLE_API_KEY)
+model = genai.GenerativeModel("gemini-1.5-flash") # Updated to a newer recommended model
 
-MikuReplicated=load_mem("storage.json")
+# load resources.font like that one in win 10
+BOT_PERSONALITY = load_bot_personality()
+WORD_FILTERS = load_word_filters()
 
-bot= commands.bot(command_prefix="!c", intents=intents)
+user_sessions = memory_manager.load_sessions(model, file_path=MEMORY_FILE)
 
-# i realise the bot wasn't sleeping
-async def unloadpeoplewhohadnotchattedawhile():
+# Set up Discord bot intents and command prefix
+intents = discord.Intents.default()
+intents.message_content = True
+bot = commands.Bot(command_prefix="!", intents=intents)
+
+
+# BACKGROUND TASKS THAT DO THINGS Something like that
+
+async def unload_inactive_sessions():
+    """Periodically checks for and removes inactive user sessions to save memory."""
     while True:
-        await asyncio.sleep(60) # seconds timeline
+        await asyncio.sleep(INACTIVITY_CHECK_SECONDS)
+        
         now = datetime.now(timezone.utc)
-        unloadpeoplewhohadnotchattedawhile_id = []
+        inactive_user_ids = []
 
-        # This Borrows ur userid so it knows you when you log back on or not
-        for userid in list(MikuReplicated.keys()):
-            data=MikuReplicated.get(userid)
-            if isinstance(data, dict) and "lastactive" in data:
-                if now-data["lastactive"] > timedelta(minutes=4):
-                    unloadpeoplewhohadnotchattedawhile.append(userid)
-            elif data is not None:
-                pass # skip if format is incorrect or horrible
-        for userid in unloadpeoplewhohadnotchattedawhile:
-            print("{userid} has not chatted a while")
-            del MikuReplicated[userid]
+        # Cheese Is Not Made of Moon
+        for user_id in list(user_sessions.keys()):
+            session_data = user_sessions.get(user_id, {})
+            last_active = session_data.get("last_active")
+            
+            if last_active and (now - last_active > timedelta(minutes=SESSION_TIMEOUT_MINUTES)):
+                inactive_user_ids.append(user_id)
 
-# bot's starting point
-@bot.event
-async def ready():
-    print("Logged in as {bot.user}")
-    try:
-        await bot.tree.sync()
-        print("CommandsLoaded")
-    except Exception as e:
-        print("Nope Fix it again bruh")
-    bot.loop.createtask(unloadpeoplewhohadnotchattedawhile())
-   # i looped copying this cuz it's annoying
-    try:
-        await bot.load_extension("slash_commands")
-        print("slash_commands cog loaded.")
-    except Exception as e:
-        print(f"Failed to load slash_commands cog: {e}")
+        if inactive_user_ids:
+            print(f"Unloading inactive sessions for users: {inactive_user_ids}")
+            for user_id in inactive_user_ids:
+                del user_sessions[user_id]
+            # i hope your emmc 5.1 chip can handle it
+            memory_manager.save_sessions(user_sessions, file_path=MEMORY_FILE)
 
-    try:
-        await bot.load_extension("ReactionLib")
-        print("ReactionLib cog loaded.")
-    except Exception as e:
-        print(f"Failed to load ReactionLib cog: {e}")
+
+# Event and event something like that
 
 @bot.event
-async def on_msg(message):
-    #this is the important part they made
+async def on_ready():
+    print(f"{bot.user} is now online and ready!")
+    
+    # Load extensions (cogs)
+    for cog_name in ["slash_commands", "ReactionLib"]:
+        try:
+            await bot.load_extension(cog_name)
+            print(f"'{cog_name}' loaded successfully.")
+        except Exception as e:
+            print(f"Failed to load cog {cog_name}': {e}")
+            
+    # SYMC SLASH COMMANDS
+    try:
+        synced = await bot.tree.sync()
+        print(f"Synced {len(synced)} slash command(s).")
+    except Exception as e:
+        print(f"Failed to sync slash commands: {e}")
+
+    # Ram Says hi lmao
+    bot.loop.create_task(unload_inactive_sessions())
+
+@bot.event
+async def on_message(message):
+    """Event handler for every message the bot can see."""
     if message.author == bot.user:
         return
-    await bot.pro_cmds(message)
-    promt=None # this is quite important to set it none cuz it already had a file existing
-    #!c was for legacy command incase some things fails to run
-    # it will ignore the !c since it will actually read it instead of ignorin
-    if message.reference and message.reference and message.reference.resolved.author == bot.user:
-       promt=message.content.strip()#responds
-    elif bot.user in message.intentions:
-        promt=message.content.replace(f'@<{bot.user.id}', '').strip() # repsonds when tagged
-    elif message.content.startswith("!c"): # i kept this code til the actual version
-        promt=message.content[len("!c"):].strip() # answers on command
-    # does nothing if you just did that
-    if not promt:
-        return
-    #idk abt this but the ai told me adding this would help ma code
-    theauthorithink=str(message.author.id)
 
-    #:filtered neuro img here:
-    for filtered, responsetotext in filtered.items():
-        if filtered.lower() in promt.lower(): #self explainable
-            await message.channel.send(responsetotext.replace("{userid}", str(message.author.id)))
-            return # no response if filtered
-    now=datetime.now(timezone.utc)
-    #manage session thingy here
-    if theauthorithink not in MikuReplicated:
-        print("new session for {theauthorithink}")
-        history= [
-            {'role': 'user', 'parts': [mikuprefernce]},
-            {'role': 'model', 'parts': ["got it!"]}
+    # Let the bot process commands if any
+    await bot.process_commands(message)
+
+    # Determine if the bot should respond
+    prompt_text = None
+    if bot.user in message.mentions:
+        prompt_text = message.content.replace(f'<@{bot.user.id}>', '').strip()
+    elif message.reference and message.reference.resolved.author == bot.user:
+        prompt_text = message.content.strip()
+    elif message.content.startswith("!c "):
+        prompt_text = message.content[len("!c "):].strip()
+
+    if not prompt_text:
+        return
+
+    author_id = str(message.author.id)
+
+    # Check for filtered words
+    for word, response in WORD_FILTERS.items():
+        if word.lower() in prompt_text.lower():
+            await message.channel.send(response.format(user_id=author_id))
+            return
+
+    now = datetime.now(timezone.utc)
+
+    # Manage user session
+    if author_id not in user_sessions:
+        print(f"Creating new session for user {author_id}")
+        history = [
+            {'role': 'user', 'parts': [BOT_PERSONALITY]},
+            {'role': 'model', 'parts': ["Understood. I will act according to this persona."]}
         ]
-        chat=model.start_chat(history=history)
-        MikuReplicated[theauthorithink]={"chat": chat, "lastactive": now}
+        chat_session = model.start_chat(history=history)
+        user_sessions[author_id] = {"chat": chat_session, "last_active": now}
     else:
-        MikuReplicated[theauthorithink]["lastactive"]=now
-        chat=MikuReplicated[theauthorithink]["chat"]
-    #forwarding the preference to the ai and response
+        # Update the last active time for existing session
+        user_sessions[author_id]["last_active"] = now
+    
+    chat_session = user_sessions[author_id]["chat"]
+
     try:
         async with message.channel.typing():
-            #wait for a min to run the block api call in a seperate thread to not freeze le bot
-            responsetotext=await asyncio.to_thread(chat.send_message, promt)
-            save_mem(MikuReplicated)
-            await message.reply(responsetotext.text, mention_author=False)
+            # F A A A A A A A A A    A  H
+            response = await asyncio.to_thread(chat_session.send_message, prompt_text)
+            
+            # but the json refused so u will do it manually
+            memory_manager.save_sessions(user_sessions, file_path=MEMORY_FILE)
+            
+            await message.reply(response.text, mention_author=False)
+            
     except Exception as e:
-        print("error interaction for user {theauthorithink} code : {e}")
-        await message.channel.send("function failure contact the owner of the bot and report the bug codename {e}") # the newer version has been revamped not this one anymore
+        print(f"Error during AI interaction for user {author_id}: {e}")
+        await message.channel.send(f"Sorry, an error occurred. Please try again later. (Error: {e})")
 
-@bot.event
-#async def on_close():
-#    save_mem(MikuReplicated)
-#    print("adios ma homles") this does nothing mb dawgs
+@bot.event # never works but here for completeness(questionable lol)
+async def on_disconnect():
+    """Save memory one last time when the bot disconnects."""
+    print("Bot is disconnecting. Saving final session states...")
+    memory_manager.save_sessions(user_sessions, file_path=MEMORY_FILE)
+    print("Goodbye!")
 
-# maint point of the bot
+
+# --- Main Entry Point ---
+
 async def main():
     async with bot:
-        await bot.start(DC_Token)
+        await bot.start(DISCORD_TOKEN)
+
 if __name__ == "__main__":
-
     asyncio.run(main())
-
-
+# no you cannot see my token {the assistant lmao}
