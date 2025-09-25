@@ -3,7 +3,8 @@ Legacy Source of Miku Hatsune #8197
 
 ## Dev Note :
 F A A A A H
-Recode of the main.py since i created a chaos
+
+Recode of the main.py and changed memories.py to memory_manager.py for easier allocation
 
 subside i added the one with fixed by ai since mine looks like a racoon just tried coding
 
