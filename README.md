@@ -2,8 +2,8 @@
 Legacy Source of Miku Hatsune #8197
 
 ## Dev Note :
-the ram goes beserk if i use js so now yk why i have not coded it in javascript
-only those with threadripper can tank it
+F A A A A H
+Recode of the main.py since i created a chaos
 
 subside i added the one with fixed by ai since mine looks like a racoon just tried coding
 
